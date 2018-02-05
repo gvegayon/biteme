@@ -1,5 +1,5 @@
 
-#' Simulate a diad
+#' Simulate a dyad
 #' @export
 simulate_dyad <- function(
   rates     = c(10, 15),
@@ -9,13 +9,13 @@ simulate_dyad <- function(
 
   structure(
     .simulate_dyad(rates, mimicy, last.bite),
-    class = "bite_diad"
+    class = "bite_dyad"
   )
 }
 
 #' Plotting method
 #' @export
-plot.bite_diad <- function(x, y = NULL, ...) {
+plot.bite_dyad <- function(x, y = NULL, ...) {
 
   # Computing time range
   ran <- range(x[[1]], x[[2]])

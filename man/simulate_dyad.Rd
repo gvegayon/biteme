@@ -2,11 +2,11 @@
 % Please edit documentation in R/methods.r
 \name{simulate_dyad}
 \alias{simulate_dyad}
-\title{Simulate a diad}
+\title{Simulate a dyad}
 \usage{
 simulate_dyad(rates = c(10, 15), mimicy = c(0.1, 0.5),
   last.bite = stats::runif(1, 1, 2))
 }
 \description{
-Simulate a diad
+Simulate a dyad
 }
