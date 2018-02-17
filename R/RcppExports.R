@@ -5,3 +5,12 @@
     .Call(`_biteme_simulate_dyad`, rates, mimicry, meal_length, maxiter)
 }
 
+#' Shuffle bite data by sorting the intervals at individual level
+#' @param data A two-column integer matrix. The first column holds the times,
+#' while the second column holds the individual ids.
+#' @return A shuffled version of the data
+#' @export
+shuffle_bites <- function(data) {
+    .Call(`_biteme_shuffle_bites`, data)
+}
+
