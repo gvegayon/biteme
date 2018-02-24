@@ -3,13 +3,8 @@ using namespace Rcpp;
 
 // [[Rcpp::depends(RcppArmadillo)]]
 
-//' Shuffle bite data by sorting the intervals at individual level
-//' @param data A two-column integer matrix. The first column holds the times,
-//' while the second column holds the individual ids.
-//' @return A shuffled version of the data
-//' @export
-// [[Rcpp::export]]
-arma::imat shuffle_bites(
+// [[Rcpp::export(name = ".shuffle_bites")]]
+List shuffle_bites(
   arma::imat data
 ) {
 
@@ -46,6 +41,10 @@ arma::imat shuffle_bites(
   // Resorting the data
   arma::uvec neworder = arma::stable_sort_index(data.col(0u));
 
-  return data.rows(neworder);
+  data = data.rows(neworder);
+  return List::create(
+    _["times"] = data,
+    _["ord"]   = neworder
+  );
 
 }

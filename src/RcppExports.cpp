@@ -21,7 +21,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // shuffle_bites
-arma::imat shuffle_bites(arma::imat data);
+List shuffle_bites(arma::imat data);
 RcppExport SEXP _biteme_shuffle_bites(SEXP dataSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
