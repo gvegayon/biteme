@@ -16,3 +16,35 @@ A shuffled version of the data
 \description{
 Shuffle bite data by sorting the intervals at individual level
 }
+\examples{
+
+# Checking unbiasedness -----------------------------------------------------
+
+# In this example we permute bite data that has only 6 possible
+
+# Function to encode the shuffle
+shuffle_wrap <- function(dat) {
+  paste0(shuffle_bites(dat)$times[,1], collapse="")
+}
+
+# Fake data. This has only 6 possible permutations
+dat <- cbind(
+  time = c(0, 1, 3, 6),
+  ids  = rep(1, 4)
+)
+
+# Tabulating and plotting the permutations
+n <- 5e4
+set.seed(111224)
+ans <- replicate(n, shuffle_wrap(dat))
+ans <- table(ans)/n
+
+ans
+# ans
+#    0136    0146    0236    0256    0346    0356
+# 0.16842 0.16622 0.16618 0.16794 0.16566 0.16558
+
+# Plotting the distribution
+barplot(ans)
+
+}

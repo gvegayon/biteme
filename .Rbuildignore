@@ -1,2 +1,5 @@
 ^biteme\.Rproj$
 ^\.Rproj\.user$
+^playground$
+^LICENSE\.md$
+^\.travis\.yml$

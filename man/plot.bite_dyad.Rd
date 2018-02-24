@@ -6,6 +6,13 @@
 \usage{
 \method{plot}{bite_dyad}(x, y = NULL, ...)
 }
+\arguments{
+\item{x}{An object of class \code{bite_dyad}}
+
+\item{y}{Ignored.}
+
+\item{...}{Ignored.}
+}
 \description{
 Plotting method
 }

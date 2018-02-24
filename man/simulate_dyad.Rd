@@ -7,6 +7,13 @@
 simulate_dyad(rates = c(10, 15), mimicy = c(0.1, 0.5),
   last.bite = stats::runif(1, 1, 2))
 }
+\arguments{
+\item{rates}{Numeric vector. Vector of rates}
+
+\item{mimicy}{Numeric vector. proportion of mimicry (likelihood).}
+
+\item{last.bite}{Numeric scalar. Time of last bite.}
+}
 \description{
 Simulate a dyad
 }

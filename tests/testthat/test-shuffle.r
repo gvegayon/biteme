@@ -1,37 +1,89 @@
-library(biteme)
-library(dplyr)
-library(magrittr)
+context("Checking shuffling function")
 
-fnames <- list.files("~/Dropbox/Bite data (deidentified)/All bites/", full.names = TRUE)
-dyads  <- lapply(fnames, read_csv)
+# Packages I depend on
+suppressMessages({
+  library(dplyr, quietly = TRUE)
+  library(magrittr, quietly = TRUE)
+})
 
-set.seed(1)
-dat <- cbind(
-  times = cumsum(sample.int(100, 10, TRUE)),
-  ids   = sample.int(2, 10, TRUE)
+# Function to generate random set of bites
+gen_bites <- function(nrows = 10, nids = 2) {
+  data.frame(
+    times = cumsum(sample.int(100, nrows, TRUE)),
+    ids   = sample.int(nids, nrows, TRUE)
   )
+}
 
 # Computing the interval sets
 get_intervals <- function(x) {
   x %>%
     `colnames<-`(c("times", "ids")) %>%
-    as.data.frame %>%
-  group_by(ids) %>%
-  mutate(
-    interval  = times - lag(times)
-  ) %>%
-  split(f=.$ids) %>%
-  lapply("[[", "interval") %>%
-  lapply(sort)
+    group_by(ids) %>%
+    arrange(times) %>%
+    mutate(
+      interval  = times - lag(times)
+      ) %>%
+    split(f=.$ids) %>%
+    lapply("[[", "interval") %>%
+    lapply(sort)
 }
 
-get_intervals(dat)
+test_that("it works", {
 
-ans <- shuffle_bites(dat)
-get_intervals(ans)
+  # Generating data
+  set.seed(6665)
+  bites0 <- gen_bites(nrows = 100)
+  bites1 <- shuffle_bites(bites0)
+
+  ans0 <- get_intervals(bites0)
+  ans1 <- get_intervals(bites1)
+
+  # Intervals are preserved
+  expect_equal(ans0, ans1)
+
+  # Variables are different (at least one)
+  expect_true(any(bites0$times != bites1$times))
+  expect_true(any(bites0$ids != bites1$ids))
+
+})
+
+# Checking uniformity ----------------------------------------------------------
+
+# Function to encode the shuffle
+shuffle_wrap <- function(dat) {
+  paste0(shuffle_bites(dat)$times[,1], collapse="")
+}
+
+test_that("Is uniform", {
+
+  # Deterministic data
+  dat <- cbind(
+    time = c(0, 1, 3, 6),
+    ids  = rep(1, 4)
+  )
+
+  n <- 5e4
+  ans <- replicate(n, shuffle_wrap(dat))
+  ans <- table(ans)/n
+
+  expect_equivalent(
+    as.vector(ans), rep(1/6, 6), tolerance = .005)
+})
 
 
-dyads[[1]] %>%
-  select(bite_sec, SubjectID) %>%
-  as.matrix %>%
-  shuffle_bites
+test_that("Is uniform 2", {
+
+  # Deterministic data
+  dat <- cbind(
+    time = c(0, 1, 3, 6, 10, 11),
+    ids  = c(1, 1, 2, 1, 2, 2)
+  )
+
+  n <- 5e4
+  ans <- replicate(n, shuffle_wrap(dat))
+  ans <- table(ans)/n
+
+  expect_equivalent(
+    as.vector(ans), rep(1/4, 4), tolerance = .005)
+})
+

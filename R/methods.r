@@ -1,5 +1,8 @@
 
 #' Simulate a dyad
+#' @param rates Numeric vector. Vector of rates
+#' @param mimicy Numeric vector. proportion of mimicry (likelihood).
+#' @param last.bite Numeric scalar. Time of last bite.
 #' @export
 simulate_dyad <- function(
   rates     = c(10, 15),
@@ -14,6 +17,9 @@ simulate_dyad <- function(
 }
 
 #' Plotting method
+#' @param x An object of class `bite_dyad`
+#' @param y Ignored.
+#' @param ... Ignored.
 #' @export
 plot.bite_dyad <- function(x, y = NULL, ...) {
 
