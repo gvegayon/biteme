@@ -5,6 +5,10 @@
     .Call(`_biteme_simulate_dyad`, rates, mimicry, meal_length, maxiter)
 }
 
+shuffle_bites_sorted <- function(data, ids) {
+    .Call(`_biteme_shuffle_bites_sorted`, data, ids)
+}
+
 .shuffle_bites <- function(data) {
     .Call(`_biteme_shuffle_bites`, data)
 }

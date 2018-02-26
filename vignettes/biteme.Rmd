@@ -27,3 +27,34 @@ For the dependent process: Let $m_i \in [0,1]$ denote the propensity to mimicry 
 1.  If $j$ was the last one to draw, then $k$ will draw $t_{kt} \sim \mbox{Exp}\left(\lambda_k(1 - m_k) + (t_{it-1} - t_{k-1})^{-1}m_k\right)$, otherwise we set $t_{kt} \sim \mbox{Exp}\left(\lambda_k\right)$.
 
 2.  If $\sum_t t_{kt} \geq l$, stop.
+
+```{r, eval=FALSE}
+library(biteme)
+
+# Loading the data
+fnames <- list.files("~/Dropbox/Bite data (deidentified)/All bites/", full.names = TRUE)
+dyads  <- lapply(fnames, readr::read_csv)
+
+# Turning times into integers
+dyads <- lapply(dyads, function(x) {
+  x$BiteTime_hms <- as.integer(x$BiteTime_hms)
+  x
+})
+
+# Defining the statistic
+# Difference between i and j
+stat <- function(x) {
+
+  x <- x[dplyr::lag(x$SubjectID) != x$SubjectID,]
+  x$slag <- dplyr::lag(x[[1]])
+  mean(x[[1]] - x$slag, na.rm=TRUE)
+
+}
+
+# Running the permutation tests
+ans <- lapply(dyads, perm_test, statistic = stat, R = 1000, ncores = 6)
+
+# Printing results
+ans
+```
+

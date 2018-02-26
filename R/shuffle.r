@@ -78,6 +78,9 @@ perm_test <- function(
   cl     = NULL
 ) {
 
+  # Observed statistic
+  ans0 <- statistic(data)
+
   if (ncores > 1L) {
 
     # If we need to create a cluster
@@ -101,19 +104,45 @@ perm_test <- function(
       ...
       )
 
-    return(ans)
+  } else {
+
+    ans <- sapply(
+      X  = seq_len(R),
+      function(i, dat, statistic, ...) {
+        statistic(shuffle_bites(dat))
+      },
+      dat  = data,
+      stat = statistic,
+      ...,
+      simplify = TRUE
+    )
 
   }
 
-  sapply(
-    X  = seq_len(R),
-    function(i, dat, statistic, ...) {
-      statistic(shuffle_bites(dat))
-    },
-    dat  = data,
-    stat = statistic,
-    ...
-  )
+  # Coercing data
+  ans <- matrix(ans, ncol = length(ans0), byrow = TRUE)
+
+  # Computing pvalues
+  pval <- colMeans(ans < matrix(ans0, ncol=ncol(ans), nrow = nrow(ans), byrow = TRUE))
+  pval <- ifelse(pval > .5, 1 - pval, pval)
+
+  structure(
+    list(
+      pval = pval,
+      t0   = ans0,
+      t    = ans
+      ),
+    class = "biteme_perm"
+    )
+
+}
+
+#' @export
+print.biteme_perm <- function(x, ...) {
+
+  cat("\nPermutation test on bite data\n")
+  cat(sprintf("Number of permutations: %i\n", nrow(x$t)))
+  cat(sprintf("Pr(t0[%1$i] < t[%1$i]): %2$.4f\n", 1:length(x$pval), x$pval), append = TRUE)
 
 
 }
