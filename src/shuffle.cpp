@@ -3,10 +3,10 @@ using namespace Rcpp;
 
 // [[Rcpp::depends(RcppArmadillo)]]
 
-// [[Rcpp::export]]
+// [[Rcpp::export(name = ".shuffle_bites_sorted")]]
 List shuffle_bites_sorted(
   arma::imat data,
-  std::vector< arma::uvec > ids
+  const std::vector< arma::uvec > & ids
 ) {
 
   // Computing intervals
@@ -39,26 +39,28 @@ List shuffle_bites_sorted(
   // Resorting the data
   arma::uvec neworder = arma::stable_sort_index(data.col(0u));
 
-  data = data.rows(neworder);
+  // data = data.rows(neworder);
   return List::create(
     _["times"] = data,
     _["ord"]   = neworder
   );
 }
 
-// [[Rcpp::export(name = ".shuffle_bites")]]
-List shuffle_bites(
+// [[Rcpp::export(name = ".shuffle_bites_unsorted")]]
+List shuffle_bites_unsorted(
   arma::imat data
 ) {
 
   // Getting unique ids
   arma::ivec ids = unique(data.col(1u));
+  std::vector< arma::uvec > idpos;
 
   // Computing intervals
   for (unsigned int id = 0u; id < ids.size(); id++) {
 
     // Getting vector of indices
     arma::uvec idx = arma::find(data.col(1u) == ids.at(id));
+    idpos.push_back(idx);
 
     // If only one observation, then we just continue
     if (idx.size() <= 2u)
@@ -84,10 +86,12 @@ List shuffle_bites(
   // Resorting the data
   arma::uvec neworder = arma::stable_sort_index(data.col(0u));
 
-  data = data.rows(neworder);
+  // data = data.rows(neworder);
   return List::create(
     _["times"] = data,
-    _["ord"]   = neworder
+    _["ord"]   = neworder,
+    _["ids"]   = ids,
+    _["pos"]   = idpos
   );
 
 }

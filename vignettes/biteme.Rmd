@@ -2,7 +2,7 @@
 title: "Vignette Title"
 author: "Vignette Author"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: rmarkdown::pdf_document
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
@@ -12,23 +12,25 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  out.width = ".8\\linewidth",
+  fig.width = 10
 )
 ```
 
-We simulate the bites dyads as a poisson process with parameter $\lambda$ (bites per minute) in the following fashion:
+<!-- We simulate the bites dyads as a poisson process with parameter $\lambda$ (bites per minute) in the following fashion: -->
 
-Both processes, with and without mimicry, will have a length of $l \sim U(\underline{l}, \overline{l})$, this is the maximum length of the meal.
+<!-- Both processes, with and without mimicry, will have a length of $l \sim U(\underline{l}, \overline{l})$, this is the maximum length of the meal. -->
 
-Independent process: Simply, for each individual $i\in\{1,2\}$ we draw time intervals $t_{ib}\sim\mbox{Exp}(\lambda)$, $b$ indexing by the number of bite, until the cumulative sum of it reaches $l$.
+<!-- Independent process: Simply, for each individual $i\in\{1,2\}$ we draw time intervals $t_{ib}\sim\mbox{Exp}(\lambda)$, $b$ indexing by the number of bite, until the cumulative sum of it reaches $l$. -->
 
-For the dependent process: Let $m_i \in [0,1]$ denote the propensity to mimicry of individual i. We start the algorithm by randomly choosing which individual starts, WLOG individual $i$ starts. We set the initial draw for each individual to be $t_{i0} = 0$.
+<!-- For the dependent process: Let $m_i \in [0,1]$ denote the propensity to mimicry of individual i. We start the algorithm by randomly choosing which individual starts, WLOG individual $i$ starts. We set the initial draw for each individual to be $t_{i0} = 0$. -->
 
-1.  If $j$ was the last one to draw, then $k$ will draw $t_{kt} \sim \mbox{Exp}\left(\lambda_k(1 - m_k) + (t_{it-1} - t_{k-1})^{-1}m_k\right)$, otherwise we set $t_{kt} \sim \mbox{Exp}\left(\lambda_k\right)$.
+<!-- 1.  If $j$ was the last one to draw, then $k$ will draw $t_{kt} \sim \mbox{Exp}\left(\lambda_k(1 - m_k) + (t_{it-1} - t_{k-1})^{-1}m_k\right)$, otherwise we set $t_{kt} \sim \mbox{Exp}\left(\lambda_k\right)$. -->
 
-2.  If $\sum_t t_{kt} \geq l$, stop.
+<!-- 2.  If $\sum_t t_{kt} \geq l$, stop. -->
 
-```{r, eval=FALSE}
+```{r, eval=TRUE, echo=FALSE, cache=TRUE}
 library(biteme)
 
 # Loading the data
@@ -38,23 +40,35 @@ dyads  <- lapply(fnames, readr::read_csv)
 # Turning times into integers
 dyads <- lapply(dyads, function(x) {
   x$BiteTime_hms <- as.integer(x$BiteTime_hms)
-  x
+  as.matrix(x[,1:2])
 })
 
 # Defining the statistic
 # Difference between i and j
 stat <- function(x) {
 
-  x <- x[dplyr::lag(x$SubjectID) != x$SubjectID,]
-  x$slag <- dplyr::lag(x[[1]])
-  mean(x[[1]] - x$slag, na.rm=TRUE)
-
+  # Only pairs that are different
+  x <- x[dplyr::lag(x[,2,drop=TRUE]) != x[,2,drop=TRUE],,drop=FALSE]
+  
+  if (nrow(x) == 1)
+    return(NA)
+  
+  y <- dplyr::lag(x[,1,drop=TRUE])
+  mean(x[,1,drop=TRUE] - y, na.rm=TRUE)
 }
 
 # Running the permutation tests
-ans <- lapply(dyads, perm_test, statistic = stat, R = 1000, ncores = 6)
+cl <- parallel::makeForkCluster(6)
+ans01 <- perm_test(dyads[[2]], stat, R = 1e4, cl = cl)
+ans02 <- perm_test(dyads[[2]], biteme:::timegap, R = 1e4, cl = cl)
 
-# Printing results
-ans
+ans <- lapply(
+  dyads, perm_test, statistic = biteme:::timegap, R = 10000, cl = cl
+  )
+parallel::stopCluster(cl)
+```
+
+```{r}
+lapply(ans, plot, breaks=50L)
 ```
 

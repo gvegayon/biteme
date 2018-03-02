@@ -42,8 +42,8 @@ test_that("it works", {
   expect_equal(ans0, ans1)
 
   # Variables are different (at least one)
-  expect_true(any(bites0$times != bites1$times))
-  expect_true(any(bites0$ids != bites1$ids))
+  expect_true(any(bites0$times != bites1[,1]))
+  expect_true(any(bites0$ids != bites1[,2]))
 
 })
 
@@ -51,7 +51,7 @@ test_that("it works", {
 
 # Function to encode the shuffle
 shuffle_wrap <- function(dat) {
-  paste0(shuffle_bites(dat)$times[,1], collapse="")
+  paste0(shuffle_bites(dat)[,1], collapse="")
 }
 
 test_that("Is uniform", {

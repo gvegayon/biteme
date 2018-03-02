@@ -21,25 +21,36 @@ BEGIN_RCPP
 END_RCPP
 }
 // shuffle_bites_sorted
-List shuffle_bites_sorted(arma::imat data, std::vector< arma::uvec > ids);
+List shuffle_bites_sorted(arma::imat data, const std::vector< arma::uvec >& ids);
 RcppExport SEXP _biteme_shuffle_bites_sorted(SEXP dataSEXP, SEXP idsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::imat >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< std::vector< arma::uvec > >::type ids(idsSEXP);
+    Rcpp::traits::input_parameter< const std::vector< arma::uvec >& >::type ids(idsSEXP);
     rcpp_result_gen = Rcpp::wrap(shuffle_bites_sorted(data, ids));
     return rcpp_result_gen;
 END_RCPP
 }
-// shuffle_bites
-List shuffle_bites(arma::imat data);
-RcppExport SEXP _biteme_shuffle_bites(SEXP dataSEXP) {
+// shuffle_bites_unsorted
+List shuffle_bites_unsorted(arma::imat data);
+RcppExport SEXP _biteme_shuffle_bites_unsorted(SEXP dataSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::imat >::type data(dataSEXP);
-    rcpp_result_gen = Rcpp::wrap(shuffle_bites(data));
+    rcpp_result_gen = Rcpp::wrap(shuffle_bites_unsorted(data));
+    return rcpp_result_gen;
+END_RCPP
+}
+// timegap
+NumericVector timegap(const NumericMatrix& data);
+RcppExport SEXP _biteme_timegap(SEXP dataSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type data(dataSEXP);
+    rcpp_result_gen = Rcpp::wrap(timegap(data));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -47,7 +58,8 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_biteme_simulate_dyad", (DL_FUNC) &_biteme_simulate_dyad, 4},
     {"_biteme_shuffle_bites_sorted", (DL_FUNC) &_biteme_shuffle_bites_sorted, 2},
-    {"_biteme_shuffle_bites", (DL_FUNC) &_biteme_shuffle_bites, 1},
+    {"_biteme_shuffle_bites_unsorted", (DL_FUNC) &_biteme_shuffle_bites_unsorted, 1},
+    {"_biteme_timegap", (DL_FUNC) &_biteme_timegap, 1},
     {NULL, NULL, 0}
 };
 

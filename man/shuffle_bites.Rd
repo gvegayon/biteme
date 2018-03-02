@@ -2,19 +2,47 @@
 % Please edit documentation in R/shuffle.r
 \name{shuffle_bites}
 \alias{shuffle_bites}
+\alias{shuffle_bites.default}
+\alias{shuffle_bites.data.frame}
 \title{Shuffle bite data by sorting the intervals at individual level}
 \usage{
-shuffle_bites(data)
+shuffle_bites(data, ...)
+
+\method{shuffle_bites}{default}(data, locations = NULL, ...)
+
+\method{shuffle_bites}{data.frame}(data, locations = NULL, coerce = TRUE,
+  return.raw = FALSE, ...)
 }
 \arguments{
 \item{data}{A two-column integer matrix. The first column holds the times,
 while the second column holds the individual ids.}
+
+\item{...}{Further arguments passed to the method.}
+
+\item{locations}{A list of length \code{unique(data[,2])} with each individual's
+observations row locations in \code{data}. For advance use only (see details).}
+
+\item{coerce}{Logical scalar. When \code{TRUE} it makes sure that the first two
+columns of the data are integer. You can skip this if you know that the
+columns are integer (runs faster).}
+
+\item{return.raw}{Logical scalar. When \code{TRUE} it returns the shuffled version
+of the data (first two columns only) (also runs faster).}
 }
 \value{
 A shuffled version of the data
 }
 \description{
 Shuffle bite data by sorting the intervals at individual level
+}
+\details{
+When \code{locations} is not provided, the algorithm by default generates the \code{locations}
+list. The structure of such list should be 1 element per individual, and
+for each individual an integer vector with positions from \code{0:(nrow(data) - 1)}
+(indexing from 0) of where their observations are located at. The advantage
+of using this parameter is that we avoid sorting and finding such positions
+each time that the algorithm is called, which can make it significantly faster\preformatted{lapply(sort(unique(data[,2])) , function(x) which(data[,2] == x) - 1L)
+}
 }
 \examples{
 
@@ -24,7 +52,7 @@ Shuffle bite data by sorting the intervals at individual level
 
 # Function to encode the shuffle
 shuffle_wrap <- function(dat) {
-  paste0(shuffle_bites(dat)$times[,1], collapse="")
+  paste0(shuffle_bites(dat)[,1], collapse="")
 }
 
 # Fake data. This has only 6 possible permutations

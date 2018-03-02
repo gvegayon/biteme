@@ -7,12 +7,17 @@ library(tidyr)
 fnames <- list.files("~/Dropbox/Bite data (deidentified)/All bites/", full.names = TRUE)
 dyads  <- lapply(fnames, read_csv)
 
+dyads <- lapply(dyads, function(x) {
+  x[[1]] <- as.integer(x[[1]])
+  x
+})
 d <- as.matrix(dyads[[1]][,1:2])
 
-set.seed(1)
-ans0 <- shuffle_bites(as.data.frame(d))
 
-ids <- unique(dyads[[1]]$SubjectID)
+set.seed(1)
+ans0 <- shuffle_bites(d)
+
+ids <- sort(unique(dyads[[1]]$SubjectID))
 ids <- lapply(ids, function(x) which(dyads[[1]]$SubjectID == x) - 1L)
 set.seed(1)
 tmp <- biteme:::shuffle_bites_sorted(d, ids)
