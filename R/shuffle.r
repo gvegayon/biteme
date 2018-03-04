@@ -234,7 +234,11 @@ plot.biteme_perm <- function(
 
     # Creating the histogram
     hist(x$t[, i], main = main[i], xlab = xlab, ylab = ylab,
-         border = border, col = col, ...)
+         border = border, col = col, ...,
+         sub = sprintf(
+           "p-val: %.4f, %i permutations",
+           x$pval[i], nrow(x$t))
+    )
 
     # Adding lines and a nice legend
     abline(v = mean(x$t[,i]), lwd=2, lty = 1, col="black")
@@ -250,7 +254,6 @@ plot.biteme_perm <- function(
       title = "Means", cex=.75, bty="n"
       )
 
-    mtext(sprintf("p-val: %.4f, %i permutations", x$pval[i], nrow(x$t)), 3)
 
   }
 

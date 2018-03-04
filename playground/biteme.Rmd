@@ -34,7 +34,7 @@ knitr::opts_chunk$set(
 library(biteme)
 
 # Loading the data
-fnames <- list.files("~/Dropbox/Bite data (deidentified)/All bites/", full.names = TRUE)
+fnames <- list.files("~/biteme-data/", pattern = "dyad", full.names = TRUE)
 dyads  <- lapply(fnames, readr::read_csv)
 
 # Turning times into integers
@@ -58,17 +58,39 @@ stat <- function(x) {
 }
 
 # Running the permutation tests
-cl <- parallel::makeForkCluster(6)
+cl <- parallel::makeForkCluster(12)
 ans01 <- perm_test(dyads[[2]], stat, R = 1e4, cl = cl)
 ans02 <- perm_test(dyads[[2]], biteme:::timegap, R = 1e4, cl = cl)
 
 ans <- lapply(
-  dyads, perm_test, statistic = biteme:::timegap, R = 10000, cl = cl
+  dyads, perm_test, statistic = biteme:::timegap, R = 500000, cl = cl
   )
 parallel::stopCluster(cl)
 ```
 
 ```{r}
-lapply(ans, plot, breaks=50L)
+# lapply(ans, plot, breaks=100L, main = c(expression(i %->% j),expression(j %->% i)))
+plot(ans[[23]], breaks=100, main = c(expression(i %->% j),expression(j %->% i)))
+plot(ans[[22]], breaks=100, main = c(expression(i %->% j),expression(j %->% i)))
 ```
+
+```{r}
+pvals<-as.vector(t(sapply(ans, "[[", "pval")))
+names(pvals) <- c(
+  sprintf("%2i(a)", as.integer(stringr::str_extract(fnames, "[0-9]+"))),
+  sprintf("%2i(b)", as.integer(stringr::str_extract(fnames, "[0-9]+")))
+  )
+pvals <- sort(pvals)
+cols <- rep("tomato", length(pvals))
+cols[which(pvals <= .05)] <- "steelblue"
+barplot(pvals, las=2, cex.names=1, col=cols, border=NA)
+abline(h=.05, lwd=2, lty=2)
+text(x = 2, y = .05, labels = "p-value 0.05", pos = 3)
+title(
+  "p-values from the permuitation tests",
+  xlab = "Dyad",
+  ylab = "p-value"
+)
+```
+
 
