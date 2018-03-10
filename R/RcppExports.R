@@ -13,7 +13,7 @@
     .Call(`_biteme_shuffle_bites_unsorted`, data)
 }
 
-timegap <- function(data) {
+.timegap <- function(data) {
     .Call(`_biteme_timegap`, data)
 }
 

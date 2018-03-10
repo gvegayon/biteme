@@ -3,7 +3,7 @@ using namespace Rcpp;
 
 // This is a simple example of exporting a C++ function to R. You can
 
-// [[Rcpp::export]]
+// [[Rcpp::export(name = ".timegap")]]
 NumericVector timegap(
   const NumericMatrix & data
 ) {
