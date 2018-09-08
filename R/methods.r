@@ -24,6 +24,8 @@ simulate_dyad <- function(
 plot.bite_dyad <- function(x, y = NULL, ...) {
 
   # Computing time range
+  op <- graphics::par(mar = rep(0, 4))
+  on.exit(graphics::par(op))
   ran <- range(x[[1]], x[[2]])
 
   plot.new()
