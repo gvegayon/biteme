@@ -28,8 +28,8 @@ plot.bite_dyad <- function(x, y = NULL, ...) {
   on.exit(graphics::par(op))
   ran <- range(x[[1]], x[[2]])
 
-  plot.new()
-  plot.window(xlim = ran, ylim = c(.5, 2.5))
+  graphics::plot.new()
+  graphics::plot.window(xlim = ran, ylim = c(.5, 2.5))
 
   xstart <- diff(ran)*.1+ran[1]
 
@@ -37,10 +37,10 @@ plot.bite_dyad <- function(x, y = NULL, ...) {
 
   cols <- c("steelblue", "tomato")
   for (i in 1:2) {
-    text(x=xstart, y = i + .1, labels = paste("Subject", i))
+    graphics::text(x=xstart, y = i + .1, labels = paste("Subject", i))
 
     for (k in 1:length(x[[i]]))
-      text(
+      graphics::text(
         x = x[[i]][k],
         y = i,
         labels = substitute(t[i]^j, list(i=i, j=k)),

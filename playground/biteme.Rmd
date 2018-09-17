@@ -30,7 +30,7 @@ knitr::opts_chunk$set(
 
 <!-- 2.  If $\sum_t t_{kt} \geq l$, stop. -->
 
-```{r, eval=TRUE, echo=FALSE, cache=TRUE}
+```{r, eval=TRUE, echo=FALSE, cache=TRUE, message=FALSE}
 library(biteme)
 
 # Loading the data
@@ -43,54 +43,38 @@ dyads <- lapply(dyads, function(x) {
   as.matrix(x[,1:2])
 })
 
-# Defining the statistic
-# Difference between i and j
-stat <- function(x) {
-
-  # Only pairs that are different
-  x <- x[dplyr::lag(x[,2,drop=TRUE]) != x[,2,drop=TRUE],,drop=FALSE]
-  
-  if (nrow(x) == 1)
-    return(NA)
-  
-  y <- dplyr::lag(x[,1,drop=TRUE])
-  mean(x[,1,drop=TRUE] - y, na.rm=TRUE)
-}
-
 # Running the permutation tests
 cl <- parallel::makeForkCluster(12)
-ans01 <- perm_test(dyads[[2]], stat, R = 1e4, cl = cl)
 ans02 <- perm_test(dyads[[2]], biteme:::timegap, R = 1e4, cl = cl)
 
 ans <- lapply(
-  dyads, perm_test, statistic = biteme:::timegap, R = 500000, cl = cl
+  dyads, perm_test, statistic = biteme:::timegap, R = 100000, cl = cl
   )
 parallel::stopCluster(cl)
 ```
 
 ```{r}
-# lapply(ans, plot, breaks=100L, main = c(expression(i %->% j),expression(j %->% i)))
-plot(ans[[23]], breaks=100, main = c(expression(i %->% j),expression(j %->% i)))
-plot(ans[[22]], breaks=100, main = c(expression(i %->% j),expression(j %->% i)))
+plot(ans[[23]], breaks=100)
+plot(ans[[22]], breaks=100)
 ```
 
 ```{r}
-pvals<-as.vector(t(sapply(ans, "[[", "pval")))
-names(pvals) <- c(
-  sprintf("%2i(a)", as.integer(stringr::str_extract(fnames, "[0-9]+"))),
-  sprintf("%2i(b)", as.integer(stringr::str_extract(fnames, "[0-9]+")))
-  )
+pvals<-unlist(sapply(ans, "[[", "pval", simplify = FALSE))
 pvals <- sort(pvals)
 cols <- rep("tomato", length(pvals))
 cols[which(pvals <= .05)] <- "steelblue"
+
+op <- par(mai = par()$mai + c(.5,0,0,0))
+
 barplot(pvals, las=2, cex.names=1, col=cols, border=NA)
 abline(h=.05, lwd=2, lty=2)
 text(x = 2, y = .05, labels = "p-value 0.05", pos = 3)
 title(
   "p-values from the permuitation tests",
-  xlab = "Dyad",
+  xlab = "",
   ylab = "p-value"
 )
+par(op)
 ```
 
 

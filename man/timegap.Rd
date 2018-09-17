@@ -20,7 +20,7 @@ the second column the ids.}
 }
 \value{
 A vector of length \code{length(unique(data[,2]))} with average time between bites
-of \code{i-&gt;j} and \code{j-&gt;i}
+of \code{i->j} and \code{j->i}
 }
 \description{
 Compute average time gap (time inverval) between ego-alter bites

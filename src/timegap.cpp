@@ -1,8 +1,9 @@
 #include <RcppArmadillo.h>
 using namespace Rcpp;
 
-// This is a simple example of exporting a C++ function to R. You can
-
+//' @param A data.frame or numeric matrix. The first column should be time and
+//' the second column the ids.
+//' @noRd
 // [[Rcpp::export(name = ".timegap")]]
 NumericVector timegap(
   const NumericMatrix & data
@@ -17,11 +18,19 @@ NumericVector timegap(
     return ans;
   }
 
+  bool idscatched = false;
+  std::vector< int > ids(2);
   for (int i = 1; i < (int) data.nrow(); i++) {
 
     // Can't compare against myself
     if (data(i, 1) == data(i-1, 1))
       continue;
+
+    if (!idscatched) {
+      ids[0] = data(i, 1);
+      ids[1] = data(i - 1, 1);
+      idscatched = true;
+    }
 
     if (data(i, 1) > data(i-1, 1)) {
       ans(0) += data(i, 0) - data(i-1, 0);
@@ -32,6 +41,17 @@ NumericVector timegap(
     }
   }
 
-  return ans/n;
+  // StringVector names(2);
+  // char buffer0[50], buffer1[50];
+  // std::sprintf(&(buffer0[0]), "%i->%i", ids[0], ids[1]);
+  // std::sprintf(&(buffer1[0]), "%i->%i", ids[1], ids[0]);
+  //
+  // names[0] = buffer0;
+  // names[1] = buffer1;
+
+  ans = ans/n;
+  ans.attr("ids") = ids;
+
+  return ans;
 
 }

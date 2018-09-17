@@ -4,3 +4,6 @@
 ^LICENSE\.md$
 ^\.travis\.yml$
 ^vignettes/biteme_cache$
+^makefile$
+^README\.Rmd$
+^README\.md$

@@ -149,7 +149,7 @@ perm_test <- function(
     parallel::clusterEvalQ(cl, library(biteme))
 
     # Getting the simulation done
-    ans <- parallel::parSapply(
+    ans <- parallel::parLapply(
       cl = cl,
       X  = seq_len(R),
       function(i, dat, statistic, loc, shuf, ...) {
@@ -164,7 +164,7 @@ perm_test <- function(
 
   } else {
 
-    ans <- sapply(
+    ans <- lapply(
       X  = seq_len(R),
       function(i, dat, statistic, loc, shuf, ...) {
         statistic(do.call(shuffle_bites, c(list(dat, loc), shuf)))
@@ -179,16 +179,21 @@ perm_test <- function(
 
   }
 
+  ids <- attr(ans[[1]], "ids")
+  if (!length(ids))
+    ids <- c(0, 1)
+
   # Coercing data
-  ans <- matrix(ans, ncol = length(ans0), byrow = TRUE)
+  ans <- do.call(rbind, ans) #matrix(ans, ncol = length(ans0), byrow = TRUE)
+  colnames(ans) <- sprintf("%i->%i", ids, ids[2:1])
 
   # Computing pvalues
   pval <- colMeans(ans < matrix(ans0, ncol=ncol(ans), nrow = nrow(ans), byrow = TRUE))
-  pval <- ifelse(pval > .5, 1 - pval, pval)
+  # pval <- ifelse(pval > .5, 1 - pval, pval)
 
   # Checking names
   if (!length(names(ans0)))
-    names(ans0) <- sprintf("stat%02i", 1L:length(ans0))
+    names(ans0) <- colnames(ans)
 
   structure(
     list(
@@ -204,9 +209,15 @@ perm_test <- function(
 #' @export
 print.biteme_perm <- function(x, ...) {
 
+  # Do the pvals have colnames
+  pvalsnames <- names(x$pval)
+
+  if (!length(pvalsnames))
+    pvalsnames <- sprintf("t0[%1$i] < t[%1$i]", 1:length(x$pval))
+
   cat("\nPermutation test on bite data\n")
   cat(sprintf("Number of permutations: %i\n ", nrow(x$t)))
-  cat(sprintf("Pr(t0[%1$i] < t[%1$i]): %2$.4f\n", 1:length(x$pval), x$pval), append = TRUE)
+  cat(sprintf("Pr(%s): %2$.4f\n", pvalsnames, x$pval), append = TRUE)
 
 
 }

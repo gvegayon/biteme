@@ -13,6 +13,9 @@
     .Call(`_biteme_shuffle_bites_unsorted`, data)
 }
 
+#' @param A data.frame or numeric matrix. The first column should be time and
+#' the second column the ids.
+#' @noRd
 .timegap <- function(data) {
     .Call(`_biteme_timegap`, data)
 }
