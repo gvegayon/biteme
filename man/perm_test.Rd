@@ -4,8 +4,16 @@
 \alias{perm_test}
 \title{Permutation test}
 \usage{
-perm_test(data, statistic, R, ..., ncores = 1L, cl = NULL,
-  shuffle.args = list())
+perm_test(
+  data,
+  statistic,
+  R,
+  ...,
+  ncores = 1L,
+  cl = NULL,
+  alternative = "less",
+  shuffle.args = list()
+)
 }
 \arguments{
 \item{data}{A data set with at least 2 columns. The first columns holds times,
@@ -20,6 +28,9 @@ and the second column individual ids.}
 \item{ncores}{integer scalar. Number of cores to use.}
 
 \item{cl}{An object of class cluster.}
+
+\item{alternative}{Character scalar. Either of \code{"less"}, \code{"two.sided"}, or
+\code{"greater"}.}
 
 \item{shuffle.args}{List of aditional parameters passed to \link{shuffle_bites}.}
 }

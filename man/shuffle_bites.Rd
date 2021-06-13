@@ -10,8 +10,7 @@ shuffle_bites(data, ...)
 
 \method{shuffle_bites}{default}(data, locations = NULL, ...)
 
-\method{shuffle_bites}{data.frame}(data, locations = NULL,
-  coerce = TRUE, return.raw = FALSE, ...)
+\method{shuffle_bites}{data.frame}(data, locations = NULL, coerce = TRUE, return.raw = FALSE, ...)
 }
 \arguments{
 \item{data}{A two-column integer matrix. The first column holds the times,

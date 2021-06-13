@@ -110,6 +110,8 @@ shuffle_bites.data.frame <- function(
 #' and the second column individual ids.
 #' @param statistic A function that returns a vector. The statistic to compute
 #' @param R Integer scalar. Number of replications.
+#' @param alternative Character scalar. Either of `"less"`, `"two.sided"`, or
+#' `"greater"`.
 #' @param ... Further arguments passed to `statistic`
 #' @param shuffle.args List of aditional parameters passed to [shuffle_bites].
 #' @param ncores integer scalar. Number of cores to use.
@@ -121,10 +123,16 @@ perm_test <- function(
   statistic,
   R,
   ...,
-  ncores = 1L,
-  cl     = NULL,
+  ncores       = 1L,
+  cl           = NULL,
+  alternative  = "less",
   shuffle.args = list()
 ) {
+
+  # Checking alternative
+  if (!(alternative %in% c("less", "two.sided", "greater")))
+    stop("The value for `alternative` should be either: `less`, `two.sided`, or `greater`.",
+         call. = FALSE)
 
   # Observed statistic
   ans0 <- statistic(data)
@@ -179,17 +187,27 @@ perm_test <- function(
 
   }
 
-  ids <- attr(ans[[1]], "ids")
+  ids <- attr(ans[[1L]], "ids")
   if (!length(ids))
     ids <- c(0, 1)
 
   # Coercing data
   ans <- do.call(rbind, ans) #matrix(ans, ncol = length(ans0), byrow = TRUE)
-  colnames(ans) <- sprintf("%i->%i", ids, ids[2:1])
+  colnames(ans) <- sprintf("%i->%i", ids, ids[2L:1L])
 
   # Computing pvalues
-  pval <- colMeans(ans < matrix(ans0, ncol=ncol(ans), nrow = nrow(ans), byrow = TRUE))
-  # pval <- ifelse(pval > .5, 1 - pval, pval)
+  if (alternative == "less")
+    pval <- colMeans(ans > matrix(ans0, ncol=ncol(ans), nrow = nrow(ans), byrow = TRUE))
+  else if (alternative == "greater")
+    pval <- colMeans(ans < matrix(ans0, ncol=ncol(ans), nrow = nrow(ans), byrow = TRUE))
+  else {
+    ans0_centered <- ans0 - colMeans(ans0)
+
+
+
+    pval <- colMeans(ans < matrix(ans0, ncol=ncol(ans), nrow = nrow(ans), byrow = TRUE))
+    pval <- ifelse(pval > 0.5, 1.0 - pval, pval)
+  }
 
   # Checking names
   if (!length(names(ans0)))

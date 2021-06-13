@@ -6,4 +6,4 @@
 ^vignettes/biteme_cache$
 ^makefile$
 ^README\.Rmd$
-^README\.md$
+^\.github$

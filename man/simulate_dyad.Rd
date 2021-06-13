@@ -4,8 +4,11 @@
 \alias{simulate_dyad}
 \title{Simulate a dyad}
 \usage{
-simulate_dyad(rates = c(10, 15), mimicy = c(0.1, 0.5),
-  last.bite = stats::runif(1, 1, 2))
+simulate_dyad(
+  rates = c(10, 15),
+  mimicy = c(0.1, 0.5),
+  last.bite = stats::runif(1, 1, 2)
+)
 }
 \arguments{
 \item{rates}{Numeric vector. Vector of rates}
